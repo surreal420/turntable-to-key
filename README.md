@@ -47,13 +47,11 @@ This tool implements a scratch detection algorithm based on **beatoraja's Analog
 
 ### 1. Rotation Detection
 
-- Polls the joystick X-axis at 1000Hz (1ms intervals)
+- Polls the joystick X-axis with 1ms interval
 - Calculates delta between consecutive readings
 - Handles wraparound at axis boundaries (0-65535 range)
 
 ### 2. Direction Change Handling
-
-**Critical logic inherited from beatoraja:**
 
 When the turntable direction changes (e.g., clockwise → counter-clockwise):
 1. **Immediately release** the currently pressed key
@@ -61,31 +59,14 @@ When the turntable direction changes (e.g., clockwise → counter-clockwise):
 3. Reset tick counter to prevent rapid A-S-A-S toggling
 4. Require minimum tick threshold before activating new direction
 
-This prevents unwanted rapid key alternation during direction changes.
-
-### 3. State Machine
-
-```
-┌─────────┐   Movement detected   ┌─────────────┐
-│  Idle   │ ────(MIN_TICKS)─────→ │   Active    │
-│         │                       │  (Key Down) │
-└─────────┘                       └─────────────┘
-     ↑                                   │
-     │         No movement               │
-     │       (STOP_THRESHOLD)            │
-     └───────────────────────────────────┘
-
-Direction Change → Release key, return to Idle
-```
-
-### 4. Key Parameters
+### 3. Key Parameters
 
 | Parameter | Value | Description |
 |-----------|-------|-------------|
 | `MIN_TICKS` | 1 | Minimum movement ticks to activate scratch |
 | `STOP_THRESHOLD` | 5 | Loop cycles without movement before releasing key |
 
-### 5. Wraparound Handling
+### 4. Wraparound Handling
 
 The joystick X-axis reports values in range [0, 65535]. When the turntable crosses the boundary:
 
@@ -96,8 +77,6 @@ if (delta > 32768) {
     delta += 65536;  // Wrapped from 0 → 65535
 }
 ```
-
-This ensures correct direction detection across the axis boundary.
 
 ## Customization
 
