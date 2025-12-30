@@ -38,7 +38,7 @@ This will generate `main.exe` in the current directory.
 ## Usage
 
 1. Connect your beatmania controller to your PC
-2. Run `main.exe`
+2. Run `main.exe` and smash enter multiple times
 3. Profit
 
 ## Algorithm
