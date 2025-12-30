@@ -128,19 +128,19 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int) {
         if (minTicks > 10) minTicks = 10;
     }
 
-    printf("  Stop threshold in ms (1-1000, default=10): ");
-    UINT stopThreshold = 10;
+    printf("  Stop threshold in ticks (1-20, default=5): ");
+    UINT stopThresholdTicks = 5;
     char stopInput[32];
     fgets(stopInput, sizeof(stopInput), stdin);
     if (stopInput[0] != '\n') {
-        sscanf(stopInput, "%u", &stopThreshold);
-        if (stopThreshold < 1) stopThreshold = 1;
-        if (stopThreshold > 1000) stopThreshold = 1000;
+        sscanf(stopInput, "%u", &stopThresholdTicks);
+        if (stopThresholdTicks < 1) stopThresholdTicks = 1;
+        if (stopThresholdTicks > 20) stopThresholdTicks = 20;
     }
 
     printf("\nConfiguration:\n");
     printf("  Minimum ticks: %u\n", minTicks);
-    printf("  Stop threshold: %u ms\n", stopThreshold);
+    printf("  Stop threshold: %u ticks\n", stopThresholdTicks);
     printf("\nKey mapping:\n");
     printf("  Clockwise (>):         A key\n");
     printf("  Counter-clockwise (<): S key\n");
@@ -158,31 +158,25 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int) {
         case 5: getAxisValue = [](const JOYINFOEX* j) { return j->dwVpos; }; break;
     }
 
+    // Allocate joyInfo structure
+    JOYINFOEX joyInfo = {};
+    joyInfo.dwSize = sizeof(JOYINFOEX);
+    joyInfo.dwFlags = JOY_RETURNALL;
+
+    // Initialize lastX
+    joyGetPosEx(joystickID, &joyInfo);
+    DWORD lastX = getAxisValue(&joyInfo);
+
     // State variables (based on beatoraja's AnalogScratchAlgorithmVersion2)
-    DWORD lastX = 0;
-    bool initialized = false;
     bool scratchActive = false;        // Whether turntable is actively rotating
     bool rightMoveScratching = false;  // Current rotation direction (true=clockwise, false=counter-clockwise)
     int tickCounter = 0;               // Movement tick counter
     DWORD stopCounter = 0;             // Stop detection counter
 
     while (true) {
-        JOYINFOEX joyInfo = {};
-        joyInfo.dwSize = sizeof(JOYINFOEX);
-        joyInfo.dwFlags = JOY_RETURNALL;
-
-        MMRESULT result = joyGetPosEx(joystickID, &joyInfo);
-
-        if (result == JOYERR_NOERROR) {
+        if (joyGetPosEx(joystickID, &joyInfo) == JOYERR_NOERROR) {
             // Get current axis value using pre-selected function
             DWORD currentX = getAxisValue(&joyInfo);
-
-            // Initialize on first run
-            if (!initialized) {
-                lastX = currentX;
-                initialized = true;
-                continue;
-            }
 
             // Calculate X-axis delta
             int delta = (int)currentX - (int)lastX;
@@ -203,17 +197,16 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int) {
                     // Release current key
                     if (rightMoveScratching) {
                         releaseKey('A');
-                        printf("[ ] Direction change - A released\n");
+                        // printf("[ ] Direction change - A released\n");
                     } else {
                         releaseKey('S');
-                        printf("[ ] Direction change - S released\n");
+                        // printf("[ ] Direction change - S released\n");
                     }
 
                     scratchActive = false;
                     tickCounter = 0;
                     rightMoveScratching = nowRight;
-                }
-                else if (!scratchActive) {
+                } else if (!scratchActive) {
                     // Starting from rest
                     tickCounter++;
 
@@ -224,10 +217,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int) {
 
                         if (nowRight) {
                             pressKey('A');
-                            printf("[>] Clockwise - A pressed\n");
+                            // ("[>] Clockwise - A pressed\n");
                         } else {
                             pressKey('S');
-                            printf("[<] Counter-clockwise - S pressed\n");
+                            // printf("[<] Counter-clockwise - S pressed\n");
                         }
                     }
                 }
@@ -239,16 +232,16 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int) {
                 stopCounter++;
 
                 // Exceeded threshold, stop turntable
-                if (stopCounter > stopThreshold && scratchActive) {
+                if (stopCounter > stopThresholdTicks && scratchActive) {
                     scratchActive = false;
                     tickCounter = 0;
 
                     if (rightMoveScratching) {
                         releaseKey('A');
-                        printf("[ ] Stopped - A released\n");
+                        // printf("[ ] Stopped - A released\n");
                     } else {
                         releaseKey('S');
-                        printf("[ ] Stopped - S released\n");
+                        // printf("[ ] Stopped - S released\n");
                     }
                 }
             }

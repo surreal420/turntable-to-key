@@ -83,8 +83,7 @@ Direction Change → Release key, return to Idle
 | Parameter | Value | Description |
 |-----------|-------|-------------|
 | `MIN_TICKS` | 1 | Minimum movement ticks to activate scratch |
-| `STOP_THRESHOLD` | 10ms | Time without movement before releasing key |
-| `Polling Rate` | 1ms | Joystick polling interval |
+| `STOP_THRESHOLD` | 5 | Loop cycles without movement before releasing key |
 
 ### 5. Wraparound Handling
 
@@ -126,11 +125,12 @@ The program prompts for sensitivity settings at startup:
 - **Lower values** (1-2): More responsive, may trigger on small movements
 - **Higher values** (3-5): Less sensitive, requires deliberate rotation
 
-**Stop threshold (milliseconds):**
-- **Default: 10ms** - Quick release after stopping
-- **Range: 1-1000ms**
-- **Lower values** (1-5ms): Keys release immediately when rotation stops
-- **Higher values** (20-50ms): Keys stay pressed slightly longer
+**Stop threshold (ticks):**
+- **Default: 5 ticks** - Quick release after stopping
+- **Range: 1-20 ticks**
+- **Lower values** (1-3 ticks): Keys release immediately when rotation stops
+- **Higher values** (10-20 ticks): Keys stay pressed slightly longer
+- **Note:** Each tick ≈ 1-2ms depending on system load
 
 ## Credits
 
