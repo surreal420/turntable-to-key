@@ -107,9 +107,9 @@ The program prompts for sensitivity settings at startup:
 **Stop threshold (ticks):**
 - **Default: 5 ticks** - Quick release after stopping
 - **Range: 1-20 ticks**
-- **Lower values** (1-3 ticks): Keys release immediately when rotation stops
-- **Higher values** (10-20 ticks): Keys stay pressed slightly longer
-- **Note:** Each tick ≈ 1-2ms depending on system load
+- **Lower values** (1-3 ticks): Keys release almost immediately when rotation stops
+- **Higher values** (10-20 ticks): Keys stay pressed longer
+- **Note:** Duration of each tick depends on system load (i.e. not exact 1ms)
 
 ## Credits
 
