@@ -30,7 +30,7 @@ Install the following tools:
 Open **Developer Command Prompt for VS** and run:
 
 ```batch
-cl /std:c++20 /DUNICODE /D_UNICODE main.cpp user32.lib
+cl /O2 /std:c++20 /DUNICODE /D_UNICODE main.cpp user32.lib
 ```
 
 This will generate `main.exe` in the current directory.
