@@ -247,7 +247,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR, int) {
             }
         }
 
-        Sleep(1);
+        Sleep(2);
     }
 
     return 0;
